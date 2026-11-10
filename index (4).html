@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Placar Conexão em Jogo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500..700&family=DM+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#12203F;--paper:#FBF8F1;--sun:#FFC93C;--pink:#FF5C8A;--lime:#B8F34A;--cyan:#3DD6F5;--lilac:#B9A6FF;--soft:#4B5670;--red:#F2545B;--green:#3BB273}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'DM Sans',Arial,sans-serif;background:var(--cyan);color:var(--ink);min-height:100vh;padding:20px 16px 60px}
+  .fred,h1,h2,h3{font-family:'Fredoka',Arial,sans-serif;font-weight:700}
+  .wrap{max-width:1000px;margin:0 auto}
+  header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+  header h1{font-size:clamp(26px,5vw,40px)}
+  .pill{background:var(--ink);color:var(--paper);font-family:'Fredoka';font-weight:700;font-size:13px;letter-spacing:2px;text-transform:uppercase;padding:6px 14px;border-radius:999px;transform:rotate(-3deg)}
+  .tabs{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+  .tab{flex:1;min-width:150px;font-family:'Fredoka';font-weight:700;font-size:20px;padding:12px;border:4px solid var(--ink);border-radius:18px;background:var(--paper);box-shadow:5px 5px 0 var(--ink);cursor:pointer;color:var(--ink)}
+  .tab.on{background:var(--sun)}
+  .card{background:var(--paper);border:4px solid var(--ink);border-radius:22px;box-shadow:7px 7px 0 var(--ink);padding:18px;margin-bottom:18px}
+  .card h2{font-size:22px;margin-bottom:12px}
+  .addrow{display:flex;gap:8px;flex-wrap:wrap}
+  input,select{font:inherit;font-size:17px;border:3px solid var(--ink);border-radius:12px;padding:9px 12px;background:#fff;color:var(--ink);min-width:0}
+  .addrow input[type=text]{flex:1 1 180px}
+  button{font-family:'Fredoka';font-weight:700;font-size:17px;color:var(--ink);background:var(--paper);border:3px solid var(--ink);border-radius:999px;padding:8px 16px;box-shadow:3px 3px 0 var(--ink);cursor:pointer}
+  button:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+  .go{background:var(--lime)}
+  .sm{font-size:15px;padding:5px 11px}
+  .del{background:none;border:none;box-shadow:none;font-size:20px;padding:4px 6px;color:var(--soft)}
+  .team{display:flex;align-items:center;gap:10px;border:3px solid var(--ink);border-radius:16px;padding:10px 12px;margin-bottom:10px;background:#fff;flex-wrap:wrap}
+  .team.lead{background:var(--sun)}
+  .members{flex-basis:100%;display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding-top:4px;border-top:2px dashed #C9D3EA}
+  .chip{display:inline-flex;align-items:center;gap:2px;background:var(--paper);border:2px solid var(--ink);border-radius:999px;padding:2px 4px 2px 12px;font-weight:600;font-size:15px}
+  .chip .x{background:none;border:none;box-shadow:none;font-size:13px;padding:2px 6px;color:var(--soft)}
+  .addm{display:inline-flex;gap:6px;flex:1 1 220px}
+  .addm input{flex:1;font-size:15px;padding:5px 10px;border-width:2px}
+  .pos{font-family:'Fredoka';font-weight:700;font-size:22px;width:34px;text-align:center}
+  .team .name{flex:1 1 140px;font-weight:700;font-size:20px;word-break:break-word}
+  .btns{display:flex;gap:6px;flex-wrap:wrap}
+  .pts{font-family:'Fredoka';font-weight:700;font-size:26px;width:96px;text-align:center;padding:4px}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+  @media (max-width:640px){.stats{grid-template-columns:repeat(2,1fr)}}
+  .stat{border:3px solid var(--ink);border-radius:16px;padding:10px;text-align:center;background:#fff}
+  .stat b{display:block;font-family:'Fredoka';font-size:32px;line-height:1.1}
+  .stat span{font-size:14px;color:var(--soft)}
+  .filters{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+  .filters button.on{background:var(--cyan)}
+  .person{display:grid;grid-template-columns:1fr auto;gap:8px 12px;align-items:center;border:3px solid var(--ink);border-radius:16px;padding:10px 12px;margin-bottom:10px;background:#fff}
+  .person .who{font-weight:700;font-size:18px;word-break:break-word}
+  .person .meta{font-size:14px;color:var(--soft)}
+  .badge{display:inline-block;font-size:13px;font-weight:700;padding:2px 10px;border-radius:999px;border:2px solid var(--ink);margin-left:6px;vertical-align:middle}
+  .b-sem{background:#fff}.b-conta{background:var(--sun)}.b-posta{background:var(--lime)}
+  .ctrls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+  .check{display:flex;align-items:center;gap:6px;font-weight:700;font-size:15px;border:3px solid var(--ink);border-radius:999px;padding:5px 12px;cursor:pointer;background:var(--paper)}
+  .check input{width:18px;height:18px;accent-color:var(--ink)}
+  .count{display:flex;align-items:center;gap:6px}
+  .count .n{font-family:'Fredoka';font-weight:700;font-size:24px;min-width:34px;text-align:center}
+  .empty{color:var(--soft);text-align:center;padding:14px 0}
+  .muted{font-size:14px;color:var(--soft);margin-top:10px;line-height:1.45}
+  .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .bar{height:12px;border:2px solid var(--ink);border-radius:999px;background:#fff;overflow:hidden;margin-top:4px}
+  .bar i{display:block;height:100%;background:var(--lime)}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><span class="pill">Conexão em Jogo</span><h1>Placar da turma</h1></header>
+  <div class="tabs">
+    <button class="tab on" data-tab="equipes">Pontos das equipes</button>
+    <button class="tab" data-tab="ativa">Na ativa no LinkedIn</button>
+  </div>
+
+  <!-- EQUIPES -->
+  <section id="equipes">
+    <div class="card">
+      <h2>Equipes</h2>
+      <div class="addrow"><input type="text" id="teamName" placeholder="Nome da equipe" maxlength="30" autocomplete="off" enterkeyhint="done"><button class="go" type="button" id="teamAdd">Adicionar</button></div>
+      <div id="teams" style="margin-top:14px"></div>
+      <p class="muted">Embaixo de cada equipe, escreva o nome de cada integrante e toque em "+ nome". Toque nos botões pra somar ou tire pontos, ou toque no número e digite o total. A equipe na frente fica amarela.</p>
+      <div class="row"><button class="sm" id="zeroTeams">Zerar pontos</button></div>
+    </div>
+  </section>
+
+  <!-- NA ATIVA -->
+  <section id="ativa" class="hidden">
+    <div class="stats">
+      <div class="stat"><b id="sTotal">0</b><span>na turma</span></div>
+      <div class="stat"><b id="sConta">0</b><span>baixaram e criaram conta</span></div>
+      <div class="stat"><b id="sPosta">0</b><span>estão postando</span></div>
+      <div class="stat"><b id="sPosts">0</b><span>publicações no total</span></div>
+    </div>
+    <div class="card">
+      <h2>Participantes</h2>
+      <div class="addrow"><input type="text" id="personName" placeholder="Nome" maxlength="40" autocomplete="off" enterkeyhint="done"><button class="go" type="button" id="personAdd">Adicionar</button></div>
+      <div class="filters" id="filters">
+        <button class="sm on" data-f="todos">Todos</button>
+        <button class="sm" data-f="sem">Ainda sem conta</button>
+        <button class="sm" data-f="conta">Com conta, sem post</button>
+        <button class="sm" data-f="posta">Postando</button>
+      </div>
+      <div id="people"></div>
+      <p class="muted">Marque "Tem conta" quando a pessoa baixar o app e criar o perfil. Use + e − pra contar as publicações. É individual: cada pessoa tem o seu próprio contador, e a lista fica em ordem de quem mais publicou.</p>
+    </div>
+  </section>
+
+  <div class="card">
+    <h2>Guardar os dados</h2>
+    <p class="muted" style="margin-top:0">Tudo fica salvo neste aparelho e neste navegador. Pra não perder nada ou passar pra outro celular, baixe uma cópia e depois carregue ela de volta.</p>
+    <div class="row">
+      <button class="sm" id="exportJson">Baixar cópia</button>
+      <button class="sm" id="importBtn" type="button">Carregar cópia</button>
+      <input type="file" id="importFile" accept=".json,application/json" class="hidden">
+      <button class="sm" id="exportCsv">Baixar planilha (CSV)</button>
+    </div>
+    <p class="muted" id="backupMsg"></p>
+  </div>
+</div>
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const KEY = "conexao_em_jogo_placar";
+  let data = load();
+  let filter = "todos";
+
+  function load(){
+    try{ const v = JSON.parse(localStorage.getItem(KEY)); if(v && v.teams && v.people) return v; }catch(e){}
+    return {teams:[], people:[]};
+  }
+  function save(){ try{ localStorage.setItem(KEY, JSON.stringify(data)); }catch(e){} }
+  function esc(s){ return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+  function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+  function today(){ return new Date().toLocaleDateString("pt-BR"); }
+
+  function twice(btn, label, fn){
+    if(btn.dataset.armed){ fn(); return; }
+    const old = btn.textContent; btn.dataset.armed = "1"; btn.textContent = label;
+    setTimeout(() => { if(btn.isConnected){ delete btn.dataset.armed; btn.textContent = old; } }, 2500);
+  }
+  function onAdd(inputId, btnId, fn){
+    $(btnId).onclick = fn;
+    $(inputId).onkeydown = e => { if(e.key === "Enter"){ e.preventDefault(); fn(); } };
+  }
+  // tabs
+  document.querySelectorAll(".tab").forEach(t => t.onclick = () => {
+    document.querySelectorAll(".tab").forEach(x => x.classList.toggle("on", x === t));
+    $("equipes").classList.toggle("hidden", t.dataset.tab !== "equipes");
+    $("ativa").classList.toggle("hidden", t.dataset.tab !== "ativa");
+  });
+
+  // teams
+  function renderTeams(){
+    const list = [...data.teams].sort((a,b) => b.p - a.p);
+    const max = list.length ? list[0].p : 0;
+    $("teams").innerHTML = list.length ? list.map((t,i) => `
+      <div class="team ${max>0 && t.p===max ? 'lead':''}">
+        <div class="pos">${i+1}º</div>
+        <div class="name">${esc(t.n)}</div>
+        <div class="btns">
+          <button class="sm" data-id="${t.id}" data-d="1">+1</button>
+          <button class="sm" data-id="${t.id}" data-d="5">+5</button>
+          <button class="sm" data-id="${t.id}" data-d="10">+10</button>
+          <button class="sm" data-id="${t.id}" data-d="-1">−1</button>
+        </div>
+        <input class="pts" type="number" inputmode="numeric" min="0" value="${t.p}" data-id="${t.id}" aria-label="Pontos de ${esc(t.n)}">
+        <button class="del" data-del="${t.id}" title="Apagar equipe">✕</button>
+        <div class="members">
+          ${(t.m||[]).map((m,k) => `<span class="chip">${esc(m)}<button class="x" data-mt="${t.id}" data-mk="${k}" title="Tirar">✕</button></span>`).join("")}
+          <span class="addm"><input type="text" placeholder="Nome do integrante" maxlength="40" data-min="${t.id}" enterkeyhint="done"><button class="sm" data-madd="${t.id}">+ nome</button></span>
+        </div>
+      </div>`).join("") : '<p class="empty">Adicione as equipes pra começar.</p>';
+    $("teams").querySelectorAll("button[data-d]").forEach(b => b.onclick = () => {
+      const t = data.teams.find(x => x.id === b.dataset.id); t.p = Math.max(0, t.p + +b.dataset.d); save(); renderAll();
+    });
+    $("teams").querySelectorAll("input.pts").forEach(inp => {
+      inp.onfocus = () => inp.select();
+      inp.onkeydown = e => { if(e.key === "Enter") inp.blur(); };
+      inp.onchange = () => { const t = data.teams.find(x => x.id === inp.dataset.id); const v = parseInt(inp.value,10); t.p = isNaN(v)||v<0 ? 0 : v; save(); renderAll(); };
+    });
+    const addMember = id => {
+      const inp = $("teams").querySelector(`input[data-min="${id}"]`); const n = inp.value.trim(); if(!n) return;
+      const t = data.teams.find(x => x.id === id); (t.m = t.m || []).push(n); save(); renderAll();
+      const again = $("teams").querySelector(`input[data-min="${id}"]`); if(again) again.focus();
+    };
+    $("teams").querySelectorAll("button[data-madd]").forEach(b => b.onclick = () => addMember(b.dataset.madd));
+    $("teams").querySelectorAll("input[data-min]").forEach(i => i.onkeydown = e => { if(e.key === "Enter"){ e.preventDefault(); addMember(i.dataset.min); } });
+    $("teams").querySelectorAll("button[data-mt]").forEach(b => b.onclick = () => {
+      const t = data.teams.find(x => x.id === b.dataset.mt); t.m.splice(+b.dataset.mk, 1); save(); renderAll();
+    });
+    $("teams").querySelectorAll("button[data-del]").forEach(b => b.onclick = () => twice(b, "Apagar?", () => {
+      data.teams = data.teams.filter(x => x.id !== b.dataset.del); save(); renderAll();
+    }));
+  }
+  onAdd("teamName", "teamAdd", () => { const n = $("teamName").value.trim(); if(!n) return; data.teams.push({id:uid(), n, p:0}); $("teamName").value=""; save(); renderAll(); });
+  $("zeroTeams").onclick = () => twice($("zeroTeams"), "Toque de novo pra zerar", () => { data.teams.forEach(t => t.p = 0); save(); renderAll(); $("zeroTeams").textContent = "Zerar pontos"; delete $("zeroTeams").dataset.armed; });
+
+  // people
+  function status(p){ return p.posts > 0 ? "posta" : p.conta ? "conta" : "sem"; }
+  const LABEL = {sem:"Sem conta", conta:"Com conta", posta:"Postando"};
+  function renderPeople(){
+    const ppl = data.people;
+    $("sTotal").textContent = ppl.length;
+    $("sConta").textContent = ppl.filter(p => p.conta).length;
+    $("sPosta").textContent = ppl.filter(p => p.posts > 0).length;
+    $("sPosts").textContent = ppl.reduce((s,p) => s + p.posts, 0);
+    const list = ppl.filter(p => filter === "todos" || status(p) === filter).sort((a,b) => b.posts - a.posts || a.n.localeCompare(b.n));
+    $("people").innerHTML = list.length ? list.map(p => { const s = status(p); return `
+      <div class="person">
+        <div>
+          <div class="who">${esc(p.n)}<span class="badge b-${s}">${LABEL[s]}</span></div>
+          <div class="meta">${p.last ? "Último post em " + esc(p.last) : (p.conta ? "Ainda não postou" : "Ainda não baixou o app")}</div>
+        </div>
+        <div class="ctrls">
+          <label class="check"><input type="checkbox" data-conta="${p.id}" ${p.conta?'checked':''}> Tem conta</label>
+          <div class="count"><button class="sm" data-id="${p.id}" data-d="-1">−</button><span class="n">${p.posts}</span><button class="sm go" data-id="${p.id}" data-d="1">+ post</button></div>
+          <button class="del" data-pdel="${p.id}" title="Apagar">✕</button>
+        </div>
+      </div>`; }).join("") : `<p class="empty">${ppl.length ? "Ninguém nesse filtro." : "Adicione os participantes da turma."}</p>`;
+    $("people").querySelectorAll("input[data-conta]").forEach(c => c.onchange = () => { const p = data.people.find(x => x.id === c.dataset.conta); p.conta = c.checked; save(); renderAll(); });
+    $("people").querySelectorAll("button[data-d]").forEach(b => b.onclick = () => {
+      const p = data.people.find(x => x.id === b.dataset.id); const d = +b.dataset.d;
+      p.posts = Math.max(0, p.posts + d); if(d > 0){ p.last = today(); p.conta = true; } save(); renderAll();
+    });
+    $("people").querySelectorAll("button[data-pdel]").forEach(b => b.onclick = () => twice(b, "Apagar?", () => {
+      data.people = data.people.filter(x => x.id !== b.dataset.pdel); save(); renderAll();
+    }));
+  }
+  onAdd("personName", "personAdd", () => { const n = $("personName").value.trim(); if(!n) return; data.people.push({id:uid(), n, conta:false, posts:0, last:""}); $("personName").value=""; save(); renderAll(); $("personName").focus(); });
+  $("filters").querySelectorAll("button").forEach(b => b.onclick = () => { filter = b.dataset.f; $("filters").querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b)); renderPeople(); });
+
+  // backup
+  let dl = null;
+  if(window.claude && window.claude.use){ window.claude.use("downloads").then(d => { dl = d; }).catch(() => {}); }
+  async function download(name, text, type){
+    if(dl){ try{ await dl.save({filename:name, data:text}); }catch(e){} return; }
+    const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([text], {type})); a.download = name;
+    document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  }
+  $("exportJson").onclick = () => download("placar-conexao-em-jogo.json", JSON.stringify(data, null, 2), "application/json");
+  $("exportCsv").onclick = () => {
+    const q = s => '"' + String(s).replace(/"/g,'""') + '"';
+    let csv = "Equipe;Pontos;Integrantes\n" + data.teams.map(t => q(t.n)+";"+t.p+";"+q((t.m||[]).join(", "))).join("\n");
+    csv += "\n\nNome;Tem conta;Publicações;Último post\n" + data.people.map(p => [q(p.n), p.conta?"sim":"não", p.posts, q(p.last||"")].join(";")).join("\n");
+    download("placar-conexao-em-jogo.csv", "﻿" + csv, "text/csv");
+  };
+  $("importBtn").onclick = () => $("importFile").click();
+  $("importFile").onchange = e => {
+    const f = e.target.files[0]; if(!f) return;
+    const r = new FileReader();
+    r.onload = () => { try{ const v = JSON.parse(r.result); if(!v.teams || !v.people) throw 0; data = v; save(); renderAll(); $("backupMsg").textContent = "Cópia carregada!"; }catch(err){ $("backupMsg").textContent = "Esse arquivo não é uma cópia do placar."; } };
+    r.readAsText(f); e.target.value = "";
+  };
+
+  function renderAll(){ renderTeams(); renderPeople(); }
+  renderAll();
+})();
+</script>
+</body>
+</html>
